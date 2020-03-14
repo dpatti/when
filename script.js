@@ -11,7 +11,7 @@ const unpackState = (base64) => {
   const packed = Uint8Array.from([...atob(base64)].map(c => c.charCodeAt(0)));
   const view = new DataView(packed.buffer);
 
-  const when = new Date(Number(view.getBigUint64(0)));
+  const when = new Date(view.getFloat64(0));
   const where = [];
   for (let i = 8; i < view.byteLength; i += 2) {
     where.push(zones[view.getUint16(i)]);
@@ -25,7 +25,7 @@ const packState = (state) => {
   const packed = new Uint8Array(size);
   const view = new DataView(packed.buffer);
 
-  view.setBigUint64(0, BigInt(state.when.valueOf()));
+  view.setFloat64(0, state.when.valueOf());
   state.where.forEach((tz, i) => {
     view.setUint16((i * 2) + 8, zones.indexOf(tz));
   });
