@@ -1,30 +1,43 @@
+const zones = moment.tz.names();
+
 const defaultState = () =>
   ({
     when: new Date(),
     where: [moment.tz.guess()],
   });
 
-const parseQuery = (search) => {
-  const query = {};
+const unpackState = (base64) => {
+  const packed = Uint8Array.from([...atob(base64)].map(c => c.charCodeAt(0)));
+  const view = new DataView(packed.buffer);
 
-  if (search[0] === '?') {
-    search
-      .slice(1)
-      .split('&')
-      .map(x => x.split('='))
-      .forEach(([k, v]) => { query[k] = v; });
+  const when = new Date(Number(view.getBigUint64(0)));
+  const where = [];
+  for (let i = 8; i < view.byteLength; i += 2) {
+    where.push(zones[view.getUint16(i)]);
   }
 
-  return Object.assign(
-    {},
-    defaultState(),
-    (query.when ? { when: new Date(query.when) } : {}),
-    (query.where ? { where : query.where.split(",") } : {})
-  );
+  return { when, where };
 };
 
-const serializeQuery = (state) =>
-  `?when=${state.when.toISOString()}&where=${state.where.join(",")}`;
+const packState = (state) => {
+  const size = 8 + state.where.length * 2;
+  const packed = new Uint8Array(size);
+  const view = new DataView(packed.buffer);
+
+  view.setBigUint64(0, BigInt(state.when.valueOf()));
+  state.where.forEach((tz, i) => {
+    view.setUint16((i * 2) + 8, zones.indexOf(tz));
+  });
+
+  return btoa(String.fromCharCode(...packed));
+};
+
+const parseQuery = (search) =>
+  (search[0] === '?')
+    ? unpackState(search.slice(1))
+    : defaultState();
+
+const serializeQuery = (state) => `?${packState(state)}`;
 
 const when = document.querySelector("#when");
 const where =
@@ -40,9 +53,16 @@ const where =
       highlightFirst: true,
     }
   });
-const reset = document.querySelector("#reset");
 const canvas = document.querySelector("#canvas");
 const state = {};
+
+// Because there doesn't seem to be a way to replace the set of tags without
+// firing an add event for each tag, we have to build a sort of event silencer
+const resetTags = (tags, values) => {
+  tags.isInReset = true;
+  tags.loadOriginalValues(values);
+  tags.isInReset = false;
+}
 
 const pushState = () => {
   history.pushState(state, '', serializeQuery(state));
@@ -62,8 +82,7 @@ const fromState = (newState, shouldPushState) => {
   Object.assign(state, newState);
   if (shouldPushState) pushState()
   when.value = moment(state.when).format(moment.HTML5_FMT.DATETIME_LOCAL);
-  where.removeAllTags();
-  where.addTags(state.where);
+  resetTags(where, state.where);
 
   render();
 }
@@ -98,7 +117,9 @@ const render = () => {
 
 // setup
 when.addEventListener("change", fromInput);
-where.on("add remove", fromInput);
+where.on("add remove", _ => {
+  if (!where.isInReset) fromInput();
+});
 resetWhen.addEventListener("click", () =>
   fromState(Object.assign({}, state, { when: defaultState().when }), true));
 resetWhere.addEventListener("click", () =>
