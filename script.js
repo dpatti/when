@@ -71,8 +71,8 @@ const resetTags = (tags, values) => {
   tags.isInReset = false;
 }
 
-const pushState = () => {
-  history.pushState(state, '', serializeQuery(state));
+const updateHistory = (f) => {
+  history[f](state, '', serializeQuery(state));
 }
 
 const fromInput = () => {
@@ -80,14 +80,14 @@ const fromInput = () => {
     when: new Date(when.value),
     where: where.value.map(tag => tag.value),
   });
-  pushState();
+  updateHistory('pushState');
 
   render();
 };
 
-const fromState = (newState, shouldPushState) => {
+const fromState = (newState, withHistoryUpdate) => {
   Object.assign(state, newState);
-  if (shouldPushState) pushState();
+  if (withHistoryUpdate) updateHistory(withHistoryUpdate);
   when.value = moment(state.when).format(moment.HTML5_FMT.DATETIME_LOCAL);
   resetTags(where, state.where);
 
@@ -131,11 +131,10 @@ where.on("add remove", _ => {
   if (!where.isInReset) fromInput();
 });
 resetWhen.addEventListener("click", () =>
-  fromState(Object.assign({}, state, { when: defaultState().when }), true));
+  fromState(Object.assign({}, state, { when: defaultState().when }), 'pushState'));
 resetWhere.addEventListener("click", () =>
-  fromState(Object.assign({}, state, { where: defaultState().where }), true));
+  fromState(Object.assign({}, state, { where: defaultState().where }), 'pushState'));
 window.addEventListener("popstate", (event) => fromState(event.state));
 
 // init
-fromState(parseQuery(document.location.search));
-history.replaceState(state, '');
+fromState(parseQuery(document.location.search), 'replaceState');
