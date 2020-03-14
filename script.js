@@ -128,3 +128,4 @@ window.addEventListener("popstate", (event) => fromState(event.state));
 
 // init
 fromState(parseQuery(document.location.search));
+history.replaceState(state, '');
