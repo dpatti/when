@@ -1,4 +1,8 @@
-body {
+section {
+  margin-bottom: 3rem;
+}
+
+.main {
   margin-top: 3rem;
 }
 
