@@ -1,0 +1,19 @@
+body {
+  margin-top: 3rem;
+}
+
+.tagify {
+  margin: 1rem 0;
+}
+
+#deets td {
+  white-space: nowrap;
+}
+
+#deets tr.local {
+  font-weight: bold;
+}
+
+#deets tr.remote {
+  color: #999;
+}

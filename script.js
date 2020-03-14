@@ -1,9 +1,10 @@
 const zones = moment.tz.names();
+const localZone = moment.tz.guess();
 
 const defaultState = () =>
   ({
     when: new Date(),
-    where: [moment.tz.guess()],
+    where: [localZone],
   });
 
 const unpackState = (base64) => {
@@ -53,7 +54,7 @@ const where =
       highlightFirst: true,
     }
   });
-const canvas = document.querySelector("#canvas");
+const deets = document.querySelector("#deets");
 const state = {};
 
 // Because there doesn't seem to be a way to replace the set of tags without
@@ -80,7 +81,7 @@ const fromInput = () => {
 
 const fromState = (newState, shouldPushState) => {
   Object.assign(state, newState);
-  if (shouldPushState) pushState()
+  if (shouldPushState) pushState();
   when.value = moment(state.when).format(moment.HTML5_FMT.DATETIME_LOCAL);
   resetTags(where, state.where);
 
@@ -88,15 +89,14 @@ const fromState = (newState, shouldPushState) => {
 }
 
 const render = () => {
-  const format = (m) => m.format("h:mm a (ddd MMM D, YYYY)");
+  const format = (m) => m.format("LT (ddd MMM D, YYYY)");
   const compareBy = (m) => m.utcOffset();
-  const local = { label: "Local", moment: moment(state.when) };
   const times =
     state.where
-    .map(tz => ({ label: tz, moment: moment.tz(state.when, tz) }))
+    .map(tz => ({ where: tz, moment: moment.tz(state.when, tz) }))
     .sort((a, b) => compareBy(a.moment) - compareBy(b.moment));
 
-  canvas.innerHTML = `
+  deets.innerHTML = `
     <table>
       <thead>
         <tr>
@@ -105,9 +105,13 @@ const render = () => {
         </tr>
       </thead>
       <tbody>
-        ${[local, ...times].map((t => `
-          <tr>
-            <td>${t.label}</td>
+        <tr>
+          <td>Everywhere</td>
+          <td>${moment().to(state.when)}</td>
+        </tr>
+        ${times.map((t => `
+          <tr${t.where === localZone ? " class='local'" : " class='remote'"}>
+            <td>${t.where}</td>
             <td>${format(t.moment)}</td>
           </tr>
         `)).join('')}
