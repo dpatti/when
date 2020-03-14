@@ -11,23 +11,29 @@ const unpackState = (base64) => {
   const packed = Uint8Array.from([...atob(base64)].map(c => c.charCodeAt(0)));
   const view = new DataView(packed.buffer);
 
-  const when = new Date(view.getFloat64(0));
+  const version = view.getUint8(0);
+  // version tag with backwards-compatible loading
+  let pos = (version == 1) ? 1 : 0;
+  const when = new Date(view.getFloat64(pos));
+  pos += 8;
   const where = [];
-  for (let i = 8; i < view.byteLength; i += 2) {
-    where.push(zones[view.getUint16(i)]);
+  for (; pos < view.byteLength; pos += 2) {
+    where.push(zones[view.getUint16(pos)]);
   }
 
   return { when, where };
 };
 
 const packState = (state) => {
-  const size = 8 + state.where.length * 2;
+  const size = 1 + 8 + state.where.length * 2;
   const packed = new Uint8Array(size);
   const view = new DataView(packed.buffer);
 
-  view.setFloat64(0, state.when.valueOf());
+  const version = 1;
+  view.setUint8(0, version);
+  view.setFloat64(1, state.when.valueOf());
   state.where.forEach((tz, i) => {
-    view.setUint16((i * 2) + 8, zones.indexOf(tz));
+    view.setUint16((i * 2) + 1 + 8, zones.indexOf(tz));
   });
 
   return btoa(String.fromCharCode(...packed));
