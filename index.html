@@ -1,0 +1,35 @@
+<head>
+  <link rel="stylesheet" type="text/css" href="normalize.css">
+  <link rel="stylesheet" type="text/css" href="skeleton.css">
+  <link rel="stylesheet" type="text/css" href="tagify.css">
+</head>
+
+<body class="container">
+  <div class="row">
+    <div class="one-half column">
+      <section>
+        <h4>The Goods</h4>
+        <div id="canvas"></div>
+      </section>
+    </div>
+
+    <div class="one-half column">
+      <section>
+        <h4>When</h4>
+        <input type="datetime-local" id="when"></input>
+        <button id="resetWhen">Reset to now</button>
+      </section>
+
+      <section>
+        <h4>Where</h4>
+        <input type="tags" id="where"></input>
+        <button id="resetWhere">Reset to local</button>
+      </section>
+    </div>
+  </div>
+</body>
+
+<script src="/moment.js"></script>
+<script src="/moment-timezone-with-data-10-year-range.js"></script>
+<script src="/tagify.min.js"></script>
+<script src="/script.js"></script>
