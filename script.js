@@ -55,7 +55,6 @@ const where =
     editTags: false,
     dropdown: {
       enabled: 0,
-      position: "text",
       closeOnSelect: false,
       highlightFirst: true,
     }
