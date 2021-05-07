@@ -10,6 +10,14 @@ section {
   margin: 1rem 0;
 }
 
+#controls.noedit > .edit {
+  display: none;
+}
+
+#controls:not(.noedit) > .noedit {
+  display: none;
+}
+
 #deets td {
   white-space: nowrap;
 }

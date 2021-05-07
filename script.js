@@ -5,6 +5,7 @@ const defaultState = () =>
   ({
     when: new Date(),
     where: [localZone],
+    edit: true,
   });
 
 const unpackState = (base64) => {
@@ -21,7 +22,7 @@ const unpackState = (base64) => {
     where.push(zones[view.getUint16(pos)]);
   }
 
-  return { when, where };
+  return { when, where, edit: false };
 };
 
 const packState = (state) => {
@@ -122,6 +123,11 @@ const render = () => {
         `)).join('')}
       </tbody>
      </table>`;
+
+  const controls = document.querySelector("#controls").classList;
+  state.edit
+    ? controls.remove("noedit")
+    : controls.add("noedit");
 };
 
 // setup
@@ -129,10 +135,14 @@ when.addEventListener("change", fromInput);
 where.on("add remove", _ => {
   if (!where.isInReset) fromInput();
 });
-resetWhen.addEventListener("click", () =>
-  fromState(Object.assign({}, state, { when: defaultState().when }), 'pushState'));
-resetWhere.addEventListener("click", () =>
-  fromState(Object.assign({}, state, { where: defaultState().where }), 'pushState'));
+const updateOnClick = (el, update) => {
+  el.addEventListener("click", () => {
+    fromState(Object.assign({}, state, update), 'pushState');
+  });
+};
+updateOnClick(resetWhen, { when: defaultState().when });
+updateOnClick(resetWhere, { where: defaultState().where });
+updateOnClick(edit, { edit: true });
 window.addEventListener("popstate", (event) => fromState(event.state));
 
 // init

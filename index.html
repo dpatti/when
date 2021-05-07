@@ -20,18 +20,24 @@
         </section>
       </div>
 
-      <div class="one-half column">
-        <section>
-          <h4>When</h4>
-          <input type="datetime-local" id="when"></input>
-          <button id="resetWhen">Reset to now</button>
-        </section>
+      <div id="controls" class="one-half column">
+        <div class="edit">
+          <section>
+            <h4>When</h4>
+            <input type="datetime-local" id="when"></input>
+            <button id="resetWhen">Reset to now</button>
+          </section>
 
-        <section>
-          <h4>Where</h4>
-          <input type="tags" id="where"></input>
-          <button id="resetWhere">Reset to local</button>
-        </section>
+          <section>
+            <h4>Where</h4>
+            <input type="tags" id="where"></input>
+            <button id="resetWhere">Reset to local</button>
+          </section>
+        </div>
+
+        <div class="noedit">
+          <button id="edit">Edit</button>
+        </div>
       </div>
     </div>
   </div>
