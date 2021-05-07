@@ -1,6 +1,19 @@
 const zones = moment.tz.names();
 const localZone = moment.tz.guess();
 
+const nepotism =
+  [
+    "America/New_York",
+    "America/Chicago",
+    "America/Denver",
+    "America/Los_Angeles",
+    "Asia/Hong_Kong",
+    "Europe/London",
+  ];
+
+const zoneSelectionList =
+  nepotism.concat(moment.tz.names().filter(x => !nepotism.includes(x)));
+
 const defaultState = () =>
   ({
     when: new Date(),
@@ -51,7 +64,7 @@ const serializeQuery = (state) => `?${packState(state)}`;
 const when = document.querySelector("#when");
 const where =
   new Tagify(document.querySelector("#where"), {
-    whitelist: moment.tz.names(),
+    whitelist: zoneSelectionList,
     duplicates: false,
     enforceWhitelist: true,
     editTags: false,
