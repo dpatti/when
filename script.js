@@ -5,6 +5,7 @@ const defaultState = () =>
   ({
     when: new Date(),
     where: [localZone],
+    initial: true,
     edit: true,
   });
 
@@ -22,7 +23,7 @@ const unpackState = (base64) => {
     where.push(zones[view.getUint16(pos)]);
   }
 
-  return { when, where, edit: false };
+  return { when, where, initial: false, edit: false };
 };
 
 const packState = (state) => {
@@ -124,10 +125,15 @@ const render = () => {
       </tbody>
      </table>`;
 
-  const controls = document.querySelector("#controls").classList;
+  const controls = document.querySelector("#controls");
+  const link = document.querySelector("#link");
   state.edit
-    ? controls.remove("noedit")
-    : controls.add("noedit");
+    ? (controls.classList.remove("noedit"),
+       link.href = document.location.href)
+    : controls.classList.add("noedit");
+  state.initial
+    ? controls.parentElement.prepend(controls)
+    : controls.parentElement.append(controls);
 };
 
 // setup
@@ -135,14 +141,14 @@ when.addEventListener("change", fromInput);
 where.on("add remove", _ => {
   if (!where.isInReset) fromInput();
 });
-const updateOnClick = (el, update) => {
-  el.addEventListener("click", () => {
+const updateOnClick = (selector, update) => {
+  document.querySelector(selector).addEventListener("click", () => {
     fromState(Object.assign({}, state, update), 'pushState');
   });
 };
-updateOnClick(resetWhen, { when: defaultState().when });
-updateOnClick(resetWhere, { where: defaultState().where });
-updateOnClick(edit, { edit: true });
+updateOnClick("#resetWhen", { when: defaultState().when });
+updateOnClick("#resetWhere", { where: defaultState().where });
+updateOnClick("#edit", { edit: true });
 window.addEventListener("popstate", (event) => fromState(event.state));
 
 // init

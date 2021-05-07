@@ -18,6 +18,17 @@ section {
   display: none;
 }
 
+#link {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+#link[href]:after {
+  content: "\01f517";
+  font-size: 2rem;
+  margin: 0 0 1rem 1rem;
+}
+
 #deets td {
   white-space: nowrap;
 }
