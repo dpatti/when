@@ -56,7 +56,8 @@ const packState = (state) => {
 
 const parseQuery = (search) =>
   (search[0] === '?')
-    ? unpackState(search.slice(1))
+    // Sometimes services insert query parameters
+    ? unpackState(search.slice(1).replace(/&.+/, ''))
     : defaultState();
 
 const serializeQuery = (state) => `?${packState(state)}`;
