@@ -173,6 +173,7 @@ const updateOnClick = (selector, update) => {
 updateOnClick("#resetWhen", { when: defaultState().when });
 updateOnClick("#resetWhere", { where: defaultState().where });
 updateOnClick("#edit", { edit: true });
+updateOnClick("#new", defaultState());
 window.addEventListener("popstate", (event) => fromState(event.state));
 
 // init
