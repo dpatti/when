@@ -1,12 +1,22 @@
 const zones = moment.tz.names();
-const localZone = moment.tz.guess();
+const localZoneGuess = moment.tz.guess();
+
+const links =
+  {
+    "America/New_York": "US/Eastern",
+    "America/Chicago": "US/Central",
+    "America/Denver": "US/Mountain",
+    "America/Los_Angeles": "US/Pacific",
+  };
+
+const localZone = localZoneGuess in links ? links[localZoneGuess] : localZoneGuess;
 
 const nepotism =
   [
-    "America/New_York",
-    "America/Chicago",
-    "America/Denver",
-    "America/Los_Angeles",
+    "US/Eastern",
+    "US/Central",
+    "US/Mountain",
+    "US/Pacific",
     "Asia/Hong_Kong",
     "Europe/London",
   ];
